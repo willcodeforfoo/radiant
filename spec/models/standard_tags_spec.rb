@@ -649,6 +649,16 @@ describe "Standard Tags" do
       expected = '<a href="/foo/">Home</a> &gt; Assorted'
       page(:assorted).should render('<r:breadcrumbs />').with_relative_root('/foo').as(expected)
     end
+
+    it "with a 'exclude_current' attribute set to 'true' should not include the current page" do
+      expected = %{<a href="/">Home</a> &gt; <a href="/parent/">Parent</a> &gt; <a href="/parent/child/">Child</a> &gt; <a href="/parent/child/grandchild/">Grandchild</a>}
+      page(:great_grandchild).should render('<r:breadcrumbs exclude_current="true" />').as(expected)
+    end
+    
+    it "with a 'from_level' attribute set to '1' should not include the first page" do
+      expected = %{<a href="/parent/">Parent</a> &gt; <a href="/parent/child/">Child</a> &gt; <a href="/parent/child/grandchild/">Grandchild</a> &gt; Great Grandchild}
+      page(:great_grandchild).should render('<r:breadcrumbs from_level="1" />').as(expected)
+    end
   end
 
   describe "<r:if_url>" do

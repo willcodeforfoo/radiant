@@ -491,14 +491,20 @@ module StandardTags
     specifies the HTML fragment that is inserted between each of the breadcrumbs. By
     default it is set to @>@. The boolean nolinks attribute can be specified to render
     breadcrumbs in plain text, without any links (useful when generating title tag).
+    The boolean exclude_current attribute can be specified to exclude the current
+    page. The from_level attribute can be specified as an integer to start at a
+    particular level (0-indexed).
 
     *Usage:*
-    <pre><code><r:breadcrumbs [separator="separator_string"] [nolinks="true"] /></code></pre>
+    <pre><code><r:breadcrumbs [separator="separator_string"] [nolinks="true"] [exclude_current="true"] [from_level="1"]/></code></pre>
   }
   tag 'breadcrumbs' do |tag|
     page = tag.locals.page
     breadcrumbs = [page.breadcrumb]
     nolinks = (tag.attr['nolinks'] == 'true')
+    from_level = (tag.attr['from_level'].to_i)
+    exclude_current = (tag.attr['exclude_current'] == 'true')
+    
     page.ancestors.each do |ancestor|
       tag.locals.page = ancestor
       if nolinks
@@ -508,7 +514,10 @@ module StandardTags
       end
     end
     separator = tag.attr['separator'] || ' &gt; '
-    breadcrumbs.join(separator)
+    
+    to_level = exclude_current ? breadcrumbs.size - 1 : breadcrumbs.size
+    
+    breadcrumbs[from_level, to_level].join(separator)
   end
 
   desc %{
